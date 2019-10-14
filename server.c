@@ -65,15 +65,43 @@ int server_tcp(int sockfd)
     }
 
     for (unsigned i = 0; i < length; i++) {
-        prefix_sum[i] = htonl(prefix_sum[i]);
+        prefix_sum[i] = htonl(prefix_sum[i]); // converts the unsigned integer hostlong from host byte order to network byte order.
     }
 
-    free(buf);
-    sum = htonl(sum);
+    free(buf); // deallocates the memory previously allocated by a call to calloc, malloc, or realloc
+    sum = htonl(sum); // converts the unsigned integer hostlong from host byte order to network byte order.
 
     ssize_t s = 0;
     size_t sent_bytes = 0;
     do {
+        /*
+         * 	 * The send() function sends data on the socket with descriptor socket. The send() call applies to all connected sockets.
+             * Params
+             * socket: The socket descriptor.
+             * msg: The pointer to the buffer containing the message to transmit.
+             * length: The length of the message pointed to by the msg parameter.
+             * flags
+                The flags parameter is set by If more than one flag is specified, the logical OR operator (|) must be used to separate them.
+                MSG_OOB
+                    Sends out-of-band data on sockets that support this notion. Only SOCK_STREAM sockets support out-of-band data.
+                    The out-of-band data is a single byte.
+                    Before out-of-band data can be sent between two programs, there must be some coordination of effort.
+                    If the data is intended to not be read inline, the recipient of the out-of-band data must specify the recipient
+                    of the SIGURG signal that is generated when the out-of-band data is sent. If no recipient is set, no signal is sent.
+                    The recipient is set up by using F_SETOWN operand of the fcntl command, specifying either a pid or gid.
+                    For more information on this operand, refer to the fcntl command.
+                    The recipient of the data determines whether to receive out-of-band data inline or not inline by the setting
+                    of the SO_OOBINLINE option of setsockopt(). For more information on receiving out-of-band data,
+                    refer to the setsockopt(), recv(), recvfrom() and recvmsg() commands.
+                MSG_DONTROUTE: The SO_DONTROUTE option is turned on for the duration of the operation.
+                This is usually used only by diagnostic or routing programs.
+                If successful, send() returns 0 or greater indicating the number of bytes sent.
+                However, this does not assure that data delivery was complete.
+                A connection can be dropped by a peer socket and a SIGPIPE signal generated at a
+                later time if data delivery is not complete.
+                If unsuccessful, send() returns -1 indicating locally detected errors and sets errno
+                to one of the following values. No indication of failure to deliver is implicit in a send() routine.
+         */
         s = send(clientfd, ((void*)(&sum) + sent_bytes), sizeof(uint32_t) - sent_bytes, 0);
         if (s == -1) {
             perror("send");
@@ -108,7 +136,7 @@ int main(int argc, char *argv[])
   int sockfd;
 
   if (argc < 2) {
-    printf("Uso: ./servidor <porta>\n");
+    printf("Uso: ./server <port>\n");
     exit(1);
   }
   
