@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
         else printf("%d]", l);
     }
 
-    status = get_sum_of_ints_tcp(sockfd, tab, n, &resul);
+    status = get_sum_of_ints_tcp(sockfd, tab, n, &result);
 
     if (!status) {
       printf("\nResultado da soma de elementos do array: %u\n", result);
